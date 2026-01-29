@@ -1,50 +1,52 @@
 # Contact Form Backend
 
-Zoho Mailユーザー向けの、シンプルなコンタクトフォームバックエンドです。
+[日本語](README.ja.md)
 
-## これは何？
+A simple contact form backend for Zoho Mail users.
 
-Zoho MailのSMTPを使って、Webサイトのコンタクトフォームからメールを送信するシンプルなPythonコードです。
+## What is this?
 
-AWS Lambda、Cloud Functions、VPSなど、好きな環境で動かせます。
+Simple Python code to send emails from your website's contact form using Zoho Mail SMTP.
 
-## コア部分
+Works on AWS Lambda, Cloud Functions, VPS, or any environment you prefer.
 
-重要なのは [app.py](app.py) だけです。Zoho MailのSMTPでメールを送信するシンプルなコードなので、直接見てください。
+## Core
 
-## Zoho Mailの準備
+All you need is [app.py](app.py). It's simple code that sends emails via Zoho Mail SMTP—just take a look.
 
-1. 2段階認証を有効化
-2. アプリパスワードを生成
-   - Zoho Mail → 設定 → セキュリティ → アプリパスワード
+## Zoho Mail Setup
 
-## AWS SAMでデプロイする場合
+1. Enable 2-factor authentication
+2. Generate an app password
+   - Zoho Mail → Settings → Security → App Passwords
 
-SAMテンプレート付きなので、そのままデプロイできます：
+## Deploy with AWS SAM
+
+SAM template included. Just run:
 
 ```bash
 sam build && sam deploy --guided
 ```
 
-必要な環境変数：
-- `SENDER_EMAIL` - 送信元メールアドレス
-- `RECEIVER_EMAIL` - 受信先メールアドレス  
-- `APP_PASSWORD` - Zohoのアプリパスワード
+Required environment variables:
+- `SENDER_EMAIL` - Sender email address
+- `RECEIVER_EMAIL` - Receiver email address
+- `APP_PASSWORD` - Zoho app password
 
-## API仕様
+## API
 
 ```
 POST /
 Content-Type: application/json
 
 {
-  "name": "名前",
-  "email": "返信先メール",
-  "message": "本文"
+  "name": "Name",
+  "email": "Reply-to email",
+  "message": "Message body"
 }
 ```
 
-## フロントエンド例
+## Frontend Example
 
 ```javascript
 await fetch('YOUR_ENDPOINT_URL', {
@@ -54,10 +56,10 @@ await fetch('YOUR_ENDPOINT_URL', {
 });
 ```
 
-## 他の環境で使いたい場合
+## Other Environments
 
-Terraform、GCP、Vercel、自前サーバーなど、好きな環境に app.py のロジックを移植してください。
+Feel free to port the app.py logic to Terraform, GCP, Vercel, your own server, etc.
 
-## ライセンス
+## License
 
 MIT
