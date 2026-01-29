@@ -1,10 +1,7 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  ApiId:
-    Type: String
-    Description: "Existing HTTP API Gateway ID"
   SenderEmail:
     Type: String
     Description: "Sender email address"
@@ -14,9 +11,6 @@ Parameters:
   AppPassword:
     Type: String
     Description: "App password for email"
-  RepositoryName:
-    Type: String
-    Description: "Repository name for API path"
 
 Resources:
   ContactFormFunction:
@@ -27,45 +21,30 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.12
       Timeout: 30
+      LoggingConfig:
+        LogGroup: !Ref ContactFormLogGroup
+      FunctionUrlConfig:
+        AuthType: NONE
+        Cors:
+          AllowOrigins:
+            - "*"
+          AllowMethods:
+            - POST
+          AllowHeaders:
+            - Content-Type
       Environment:
         Variables:
           SENDER_EMAIL: !Ref SenderEmail
           RECEIVER_EMAIL: !Ref ReceiverEmail
           APP_PASSWORD: !Ref AppPassword
-      Policies:
-        - Statement:
-            - Effect: Allow
-              Action:
-                - ses:SendEmail
-                - ses:SendRawEmail
-              Resource: "*"
 
-  ApiGatewayIntegration:
-    Type: AWS::ApiGatewayV2::Integration
+  ContactFormLogGroup:
+    Type: AWS::Logs::LogGroup
     Properties:
-      ApiId: !Ref ApiId
-      IntegrationType: AWS_PROXY
-      IntegrationUri: !GetAtt ContactFormFunction.Arn
-      PayloadFormatVersion: "2.0"
-      
-  ApiGatewayRoute:
-    Type: AWS::ApiGatewayV2::Route
-    Properties:
-      ApiId: !Ref ApiId
-      RouteKey: !Sub "POST /${RepositoryName}/contact"
-      Target: !Join
-        - /
-        - - integrations
-          - !Ref ApiGatewayIntegration
+      LogGroupName: !Sub "/aws/lambda/${AWS::StackName}"
+      RetentionInDays: 30
 
-  LambdaPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !Ref ContactFormFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub 
-        - "arn:aws:execute-api:${Region}:${Account}:${ApiId}/*"
-        - Region: !Ref "AWS::Region"
-          Account: !Ref "AWS::AccountId"
-          ApiId: !Ref ApiId
+Outputs:
+  ContactFormUrl:
+    Description: "Contact Form API URL"
+    Value: !GetAtt ContactFormFunctionUrl.FunctionUrl
